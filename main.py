@@ -25,9 +25,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Filibustr API", lifespan=lifespan)
 
+origins = [
+    "https://www.filibustr.com",
+    "https://filibustr.com",
+    "https://filibustr-ui.vercel.app",
+    "http://localhost:4200",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://filibustr-ui.vercel.app"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
