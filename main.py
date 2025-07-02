@@ -1,0 +1,32 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+
+from filibustr_api.endpoints.bills import router as bills_router
+from filibustr_api.database.database import DatabaseManager
+from filibustr_api.database.base import Base
+
+from filibustr_api.database.bill_orm import BillORM
+from filibustr_api.database.sponsor_orm import SponsorORM
+
+db_manager = DatabaseManager()
+db_manager.ensure_database_exists()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with db_manager.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
+app = FastAPI(title="Filibustr API", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(bills_router, prefix="/api/bills", tags=["Bills"])
