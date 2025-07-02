@@ -9,7 +9,7 @@ load_dotenv()
 class DatabaseManager:
     def __init__(self):
         self.db_user = os.getenv("DB_USER", "postgres")
-        self.db_password = os.getenv("DB_PASSWORD", "Bastian123")
+        self.db_password = os.getenv("DB_PASSWORD", "password")
         self.db_host = os.getenv("DB_HOST", "localhost")
         self.db_port = os.getenv("DB_PORT", "5432")
         self.db_name = os.getenv("DB_NAME", "filibustr")
@@ -30,23 +30,29 @@ class DatabaseManager:
         self.Base = declarative_base()
 
     def ensure_database_exists(self):
-        admin_engine = create_engine(self.admin_database_url, isolation_level="AUTOCOMMIT")
-        with admin_engine.connect() as conn:
-            result = conn.execute(
-                text("SELECT 1 FROM pg_database WHERE datname = :name"),
-                {"name": self.db_name},
-            )
-            if not result.scalar():
-                print(f"[INFO] Creating database '{self.db_name}'...")
-                conn.execute(text(f'CREATE DATABASE "{self.db_name}"'))
-            else:
-                print(f"[INFO] Database '{self.db_name}' already exists.")
+        try:
+            admin_engine = create_engine(self.admin_database_url, isolation_level="AUTOCOMMIT")
+            with admin_engine.connect() as conn:
+                result = conn.execute(
+                    text("SELECT 1 FROM pg_database WHERE datname = :name"),
+                    {"name": self.db_name},
+                )
+                if not result.scalar():
+                    print(f"[INFO] Creating database '{self.db_name}'...")
+                    conn.execute(text(f'CREATE DATABASE "{self.db_name}"'))
+                else:
+                    print(f"[INFO] Database '{self.db_name}' already exists.")
+        except Exception as e:
+            print(f"[WARN] Could not connect to admin DB: {e}")
 
     @staticmethod
     async def get_session() -> AsyncSession:
         async with db_manager.AsyncSessionLocal() as session:
             yield session
 
-# Singleton instance
+# Singleton instance only (no side effects)
 db_manager = DatabaseManager()
-db_manager.ensure_database_exists()
+
+# Optional DB init entrypoint
+def init_database():
+    db_manager.ensure_database_exists()
