@@ -1,6 +1,4 @@
-from .congress_api import CongressAPIClient
+from filibustr_api.libraries.bills.active_bill.active_bill import CongressAPIClient
 
 
-__all__ = [
-    "CongressAPIClient"
-]
+__all__ = ["CongressAPIClient"]

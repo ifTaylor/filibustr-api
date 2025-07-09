@@ -10,7 +10,6 @@ class Sponsor(BaseModel):
     party: Optional[str] = None
     state: Optional[str] = None
 
-
     @classmethod
     def from_api(cls, sponsor_data: dict, sponsor_role: dict) -> "Sponsor":
         return cls(

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class DatabaseManager:
     def __init__(self):
         self.database_url = os.getenv("DATABASE_URL")
@@ -32,7 +33,10 @@ class DatabaseManager:
             admin_engine = create_engine(admin_url, isolation_level="AUTOCOMMIT")
 
             with admin_engine.connect() as conn:
-                result = conn.execute(text("SELECT 1 FROM pg_database WHERE datname = :name"), {"name": db_name})
+                result = conn.execute(
+                    text("SELECT 1 FROM pg_database WHERE datname = :name"),
+                    {"name": db_name},
+                )
                 if not result.scalar():
                     print(f"[INFO] Creating database '{db_name}'...")
                     conn.execute(text(f'CREATE DATABASE "{db_name}"'))
@@ -55,8 +59,10 @@ class DatabaseManager:
         async with db_manager.AsyncSessionLocal() as session:
             yield session
 
+
 # Singleton instance
 db_manager = DatabaseManager()
+
 
 def init_database():
     db_manager.ensure_database_exists()

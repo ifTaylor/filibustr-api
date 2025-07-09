@@ -1,7 +1,15 @@
 from pydantic import BaseModel
-from typing import Optional
-from .sponsor_model import Sponsor
-from filibustr_api.database.bill_orm import BillORM
+from typing import Optional, Literal
+
+from filibustr_api.libraries.bills.reaction_to_bill.reaction_to_bill_models.bill_reaction_counts_model import (
+    BillReactionCounts,
+)
+from filibustr_api.libraries.bills.active_bill.active_bill_models.sponsor_model import (
+    Sponsor,
+)
+from filibustr_api.libraries.bills.active_bill.active_bill_tables.bill_orm import (
+    BillORM,
+)
 
 
 class Bill(BaseModel):
@@ -15,8 +23,13 @@ class Bill(BaseModel):
     current_status: Optional[str]
     sponsor: Sponsor
 
+    reactions: Optional[BillReactionCounts] = None
+    user_reaction: Optional[
+        Literal["support", "oppose", "unsure", "outrage", "boring"]
+    ] = None
+
     @classmethod
-    def from_api(cls, item: dict) -> "Bill":
+    def from_api(cls, item: dict, reactions=None, user_reaction=None) -> "Bill":
         sponsor = Sponsor.from_api(
             sponsor_data=item.get("sponsor") or {},
             sponsor_role=item.get("sponsor_role") or {},
@@ -32,10 +45,14 @@ class Bill(BaseModel):
             current_chamber=item.get("current_chamber"),
             current_status=item.get("current_status"),
             sponsor=sponsor,
+            reactions=BillReactionCounts(**reactions) if reactions else None,
+            user_reaction=user_reaction,
         )
 
     @classmethod
-    def from_orm_model(cls, orm_bill: "BillORM") -> "Bill":
+    def from_orm_model(
+        cls, orm_bill: BillORM, reactions=None, user_reaction=None
+    ) -> "Bill":
         return cls(
             number=orm_bill.number,
             display_number=orm_bill.display_number,
@@ -50,6 +67,8 @@ class Bill(BaseModel):
                 party=orm_bill.sponsor_party or "",
                 state=orm_bill.sponsor_state or "",
                 firstname="",
-                lastname=""
-            )
+                lastname="",
+            ),
+            reactions=BillReactionCounts(**reactions) if reactions else None,
+            user_reaction=user_reaction,
         )

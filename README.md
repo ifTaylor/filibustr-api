@@ -15,4 +15,5 @@ It parses active congressional bills and serves them to the frontend.
 
 ```bash
 poetry install
+& "C:\Program Files\PostgreSQL\17\bin\pg_ctl.exe" start -D "C:\Program Files\PostgreSQL\17\data"
 poetry run uvicorn main:app --reload
