@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload  # <-- this is key
+from sqlalchemy.orm import selectinload
 
 from ..users.user_auth import decode_access_token
 from ..users.user_tables import UserORM

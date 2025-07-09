@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from filibustr_api.libraries.orm_base import Base
+from filibustr_api.libraries.forum.forum_tables import ForumPostORM, ForumThreadORM
 
 
 class UserORM(Base):
@@ -19,3 +20,6 @@ class UserORM(Base):
         uselist=False,
         cascade="all, delete-orphan"
     )
+
+    threads = relationship("ForumThreadORM", back_populates="creator")
+    posts = relationship("ForumPostORM", back_populates="author")

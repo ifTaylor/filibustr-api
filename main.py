@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from filibustr_api.endpoints.bills import router as bills_router
 from filibustr_api.endpoints.users import router as users_router
+from filibustr_api.endpoints.forum import router as forum_router
 from filibustr_api.database.database import db_manager, init_database
 from filibustr_api.libraries.orm_base import Base
 
@@ -51,4 +52,10 @@ app.include_router(
     router=users_router,
     prefix="/api/users",
     tags=["Users"]
+)
+
+app.include_router(
+    router=forum_router,
+    prefix="/api/forum",
+    tags=["Forum"]
 )
