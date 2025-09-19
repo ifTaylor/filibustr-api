@@ -15,7 +15,15 @@ class DatabaseManager:
         if not self.database_url:
             raise ValueError("DATABASE_URL is not set")
 
-        self.engine = create_async_engine(self.database_url, echo=True)
+        self.engine = create_async_engine(
+            self.database_url,
+            echo=False,
+            pool_pre_ping=True,
+            pool_recycle=300,
+            pool_size=5,
+            max_overflow=10,
+            future=True,
+        )
         self.AsyncSessionLocal = async_sessionmaker(
             bind=self.engine,
             class_=AsyncSession,
@@ -57,7 +65,10 @@ class DatabaseManager:
     @staticmethod
     async def get_session() -> AsyncSession:
         async with db_manager.AsyncSessionLocal() as session:
-            yield session
+            try:
+                yield session
+            finally:
+                pass
 
 
 # Singleton instance
