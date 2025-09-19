@@ -18,7 +18,6 @@ if os.getenv("AUTO_CREATE_DB", "false").lower() == "true":
 async def lifespan(app: FastAPI):
     try:
         async with db_manager.engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
     except Exception as e:
         print(f"[WARN] Could not initialize schema: {e}")
